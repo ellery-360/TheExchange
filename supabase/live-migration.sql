@@ -129,8 +129,8 @@ select cron.schedule(
   '*/10 11-21 * * 6',    -- every 10 min, 11:00-21:59 UTC, Saturdays
   $$
   select net.http_post(
-    url     := 'https://YOUR-PROJECT.supabase.co/functions/v1/settle-scores',
-    headers := '{"Content-Type":"application/json","Authorization":"Bearer YOUR-ANON-KEY"}'::jsonb
+    url     := 'https://jwnonkflqkgwxyksogcy.supabase.co/functions/v1/settle-scores',
+    headers := '{"Content-Type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3bm9ua2ZscWtnd3h5a3NvZ2N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MDE2NDYsImV4cCI6MjEwMjM3NzY0Nn0.Ngnl-KBOhntGaR4kFv-Ga8Y_A6TmqG59N3gvZzzV5S4"}'::jsonb
   );
   $$
 );
