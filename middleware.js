@@ -1,40 +1,18 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
-export async function middleware(request) {
-  let response = NextResponse.next({ request });
-
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  ) {
-    return response;
-  }
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(list) {
-          list.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
-          list.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
+/* The /enter page checks the passcode itself. Middleware only stops the
+ * request early so nothing is rendered for a visitor without the cookie. */
+export function middleware(request) {
+  const { pathname } = request.nextUrl;
+  if (pathname.startsWith("/enter")) {
+    const has = request.cookies.get("exchange_steward");
+    if (!has) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
     }
-  );
-
-  // Refreshes the session cookie. Do not remove.
-  await supabase.auth.getUser();
-  return response;
+  }
+  return NextResponse.next();
 }
 
-export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg)$).*)"],
-};
+export const config = { matcher: ["/enter/:path*"] };

@@ -54,7 +54,7 @@ html,body{margin:0;padding:0;background:var(--ink)}
 .grid{max-width:1080px; margin:0 auto; padding:0 1.25rem; display:grid; grid-template-columns:1fr 1fr; gap:1.25rem}
 .panel{background:var(--ink2); border:1px solid #332C1F; padding:1.25rem}
 .bourse{grid-column:1/2} .stocks{grid-column:2/3}
-.stocks.wide,.chart,.ledger,.venue,.season,.honours,.rules{grid-column:1/-1}
+.stocks.wide,.chart,.ledger,.venue,.counting,.season,.honours,.rules{grid-column:1/-1}
 @media (max-width:760px){.grid{grid-template-columns:1fr} .grid .panel{grid-column:1/-1}}
 
 .rubric{
@@ -155,6 +155,13 @@ tr.lose{background:rgba(158,43,37,.07)}
 .awards .w{margin:0; font-size:1.15rem; font-weight:600; display:flex; justify-content:space-between; align-items:baseline; gap:.5rem}
 .awards .w span{font-family:'Courier Prime',monospace; font-size:.82rem; color:var(--verdigris); font-weight:400}
 
+.counting .net{font-size:.95rem; font-weight:700}
+.tug{position:relative; width:100%; min-width:160px; height:22px; padding:0}
+.tug .axis{position:absolute; left:50%; top:2px; bottom:2px; width:1px; background:#3A3226}
+.tug .bar{position:absolute; top:6px; height:10px}
+.tug .bar.pos{background:var(--verdigris)}
+.tug .bar.neg{background:var(--rubric)}
+
 .rules ul{margin:0; padding-left:1.1rem}
 .rules li{margin-bottom:.55rem; font-size:.92rem}
 .rules b{color:var(--gold); font-weight:600}
@@ -200,3 +207,27 @@ input,select{
 .msg.good{color:var(--verdigris)} .msg.bad{color:var(--rubric)}
 .back{margin-top:1.5rem; font-size:.85rem}
 .back a{color:var(--dim)}
+
+.row.centred{justify-content:center; gap:.6rem}
+.row form{display:inline}
+
+.vb.goals{color:#B08CC4; border-color:rgba(107,74,122,.8)}
+
+/* --- in play --- */
+.liveband{
+  max-width:1080px; margin:0 auto 1.25rem; padding:.55rem 1.25rem;
+  display:flex; align-items:center; gap:.6rem;
+  background:rgba(158,43,37,.12); border-top:1px solid var(--rubric);
+  border-bottom:1px solid var(--rubric); color:var(--vellum);
+  font-size:.85rem; font-style:italic;
+}
+.liveband .dot{
+  width:8px; height:8px; border-radius:50%; background:var(--rubric);
+  animation:beat 1.6s ease-in-out infinite; flex:none;
+}
+@keyframes beat{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.liveband .dot,.beat{animation:none}}
+.beat{animation:beat 2.2s ease-in-out infinite}
+.sc .livemin{color:var(--rubric); font-family:'Courier Prime',monospace; font-size:.62rem}
+.res.prov{opacity:.65; font-style:italic}
+.seal.live{background:transparent; box-shadow:inset 0 0 0 3px var(--rubric); color:var(--rubric)}

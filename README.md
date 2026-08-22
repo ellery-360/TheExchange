@@ -31,24 +31,20 @@ About twenty minutes, most of it waiting.
    | Key | Value |
    |---|---|
    | `NEXT_PUBLIC_SUPABASE_URL` | your Project URL |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | your `anon` key |
-   | `NEXT_PUBLIC_SITE_URL` | your Vercel URL, no trailing slash |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | your publishable (or anon) key |
+   | `ENTRY_PASSCODE` | the shared passcode for the entry desk |
+   | `SUPABASE_SECRET_KEY` | your Supabase secret key |
+
+   The last two must **not** be prefixed `NEXT_PUBLIC_` — that prefix is
+   what sends a value to the browser. Leave "Sensitive" unticked on the
+   `NEXT_PUBLIC_` ones, since the build has to read them.
 
 4. **Deployments → Redeploy.**
 
-### 3. Point auth back at the site
+### 3. First week
 
-In Supabase, **Authentication → URL Configuration**:
-
-- **Site URL**: your Vercel URL
-- **Redirect URLs**: add `https://your-app.vercel.app/auth/confirm`
-
-Miss this and the magic links will bounce you to localhost.
-
-### 4. First week
-
-Go to `/login`, enter an email that's in `members`, click the emailed link, and you
-land on the entry desk.
+Go to `/login`, type the passcode, and you land on the entry desk. No email, no
+accounts. The cookie lasts a season.
 
 ---
 
@@ -113,9 +109,10 @@ economy mid-season if the prices feel wrong.
 
 ## Notes
 
-- **The bourse is public; writing is not.** Anyone with the link reads it. Only
-  emails in `members` can change anything, enforced by row-level security in
-  Postgres rather than in the app.
+- **The bourse is public; writing is not.** Anyone with the link reads it. Nobody
+  can write from a browser at all — row-level security refuses every write, and
+  the only path in is a server action that checks the passcode and then uses the
+  secret key, which never leaves the server.
 - **Odds are typed by hand on purpose.** Bet365 has no public API, and you need the
   price you took, not the current price.
 - **Auto-fetching scores** would go in a Supabase Edge Function on a Saturday-evening

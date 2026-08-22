@@ -6,8 +6,9 @@ import {
 } from "recharts";
 import Pillory, { Spark } from "./Pillory";
 import { createClient } from "../lib/supabase/client";
+import { configured } from "../lib/supabase/env";
 import {
-  buildMarket, awardsFor, roman, f, pctStr, list, PIGMENTS, START_PRICE,
+  buildMarket, awardsFor, roman, f, pctStr, list, PIGMENTS, START_PRICE, FINAL,
 } from "../lib/engine";
 
 export default function Exchange({ initialRows, signedIn }) {
@@ -16,7 +17,7 @@ export default function Exchange({ initialRows, signedIn }) {
 
   /* Live: anyone entering results updates every open browser. */
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
+    if (!configured) return;
     const supabase = createClient();
     const channel = supabase
       .channel("exchange-legs")
@@ -37,7 +38,7 @@ export default function Exchange({ initialRows, signedIn }) {
         <h1 className="black">The Exchange</h1>
         <p>No ledger yet. The bourse opens once the first week is entered.</p>
         <Link className="btn" href={signedIn ? "/enter" : "/login"}>
-          {signedIn ? "Enter a week" : "Sign in to begin"}
+          {signedIn ? "Enter a week" : "Steward sign in"}
         </Link>
       </div>
     );
@@ -46,6 +47,7 @@ export default function Exchange({ initialRows, signedIn }) {
   const week = gwView ? market.weeks.find((w) => w.gw === gwView) : market.lastWeek;
   const pnl = market.returned - market.staked;
   const awards = awardsFor(market);
+  const liveFor = (p) => Boolean(market.lastWeek?.legs?.find((l) => l.punter === p && l.live));
   const stocked = (market.lastWeek?.guilty || []).map((name) => ({
     name,
     tomatoes: market.stats.find((s) => s.punter === name)?.tomatoes || 0,
@@ -58,7 +60,7 @@ export default function Exchange({ initialRows, signedIn }) {
         <h1 className="black">The Exchange</h1>
         <p className="sub">Royal Bourse of the Footballing Realm · Saturday, Three of the Clock</p>
         <Link className="btn ghost" href={signedIn ? "/enter" : "/login"}>
-          {signedIn ? "Enter results" : "Sign in"}
+          {signedIn ? "Enter results" : "Steward"}
         </Link>
       </header>
 
@@ -81,6 +83,13 @@ export default function Exchange({ initialRows, signedIn }) {
         </div>
       </div>
 
+      {market.lastWeek?.live && (
+        <div className="liveband">
+          <span className="dot" />
+          Matches in play — prices are provisional and settle at full time
+        </div>
+      )}
+
       <main className="grid">
         <section className="panel bourse">
           <h2 className="rubric">The Bourse</h2>
@@ -97,7 +106,7 @@ export default function Exchange({ initialRows, signedIn }) {
                 </div>
                 <Spark data={s.spark} colour={colourOf(s.punter)} />
                 <div className="price">
-                  <b>ƒ{f(s.price)}</b>
+                  <b className={liveFor(s.punter) ? "beat" : ""}>ƒ{f(s.price)}</b>
                   <i className={s.last >= 0 ? "up" : "down"}>{pctStr(s.last)}</i>
                 </div>
               </li>
@@ -107,7 +116,15 @@ export default function Exchange({ initialRows, signedIn }) {
 
         <section className={`panel stocks ${stocked.length >= 3 ? "wide" : ""}`}>
           <h2 className="rubric">The Stocks</h2>
-          {stocked.length > 0 ? (
+          {market.lastWeek?.live ? (
+            <div className="clear">
+              <div className="seal live">?</div>
+              <p className="verdict">
+                Judgement is reserved while matches are in play. The stocks are
+                filled at full time.
+              </p>
+            </div>
+          ) : stocked.length > 0 ? (
             <>
               <Pillory occupants={stocked} />
               <p className="verdict">
@@ -197,17 +214,24 @@ export default function Exchange({ initialRows, signedIn }) {
                         <td className="nm" style={{ borderLeftColor: colourOf(l.punter) }}>{l.punter}</td>
                         <td>
                           {l.team}
-                          <span className={`vb ${l.venue === "H" ? "h" : "a"}`}>{l.venue}</span>
+                          {l.needsWin
+                            ? <span className={`vb ${l.venue === "H" ? "h" : "a"}`}>{l.venue}</span>
+                            : <span className="vb goals">GOALS</span>}
                           <small> v {l.opponent}</small>
                         </td>
                         <td className="mono">{l.extra === "NONE" ? "—" : l.extra}</td>
                         <td className="mono">{l.odds.toFixed(2)}</td>
                         <td className="mono sc">
                           {l.d ? l.d.score : "—"}
+                          {l.live && (
+                            <em className="livemin">
+                              {l.status === "HT" ? "HT" : `${l.minute ?? ""}'`}
+                            </em>
+                          )}
                           {l.d && l.result === "LOSE" && l.d.short > 0 && <em className="short">{l.d.short} short</em>}
                           {l.d && l.result === "WIN" && l.d.margin === 1 && <em className="tight">by one</em>}
                         </td>
-                        <td className="mono res">{l.result}</td>
+                        <td className={`mono res ${l.provisional ? "prov" : ""}`}>{l.result}{l.provisional && "*"}</td>
                         <td className={`mono ${week.moves[l.punter]?.pct >= 0 ? "up" : "down"}`}>
                           {pctStr(week.moves[l.punter]?.pct || 0)}
                         </td>
@@ -263,6 +287,47 @@ export default function Exchange({ initialRows, signedIn }) {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="panel counting">
+          <h2 className="rubric">The Counting House</h2>
+          <p className="vsum">
+            Winnings are split by each leg&apos;s share of the combined price, so a long
+            shout is credited more than a banker sitting beside it. Costs are the
+            forgone returns from weeks a merchant broke the acca alone.
+          </p>
+          <div className="scroller">
+            <table>
+              <thead>
+                <tr><th>Merchant</th><th>Brought in</th><th>Cost</th><th>Net</th><th /></tr>
+              </thead>
+              <tbody>
+                {[...market.stats].sort((a, b) => b.net - a.net).map((s) => {
+                  const scale = Math.max(
+                    1, ...market.stats.map((x) => Math.abs(x.net))
+                  );
+                  const w = (Math.abs(s.net) / scale) * 50;
+                  return (
+                    <tr key={s.punter}>
+                      <td className="nm" style={{ borderLeftColor: colourOf(s.punter) }}>{s.punter}</td>
+                      <td className="mono up">{s.earned > 0 ? `£${s.earned.toFixed(0)}` : "—"}</td>
+                      <td className="mono down">{s.cost > 0 ? `£${s.cost.toFixed(0)}` : "—"}</td>
+                      <td className={`mono net ${s.net >= 0 ? "up" : "down"}`}>
+                        {s.net >= 0 ? "+" : "−"}£{Math.abs(s.net).toFixed(0)}
+                      </td>
+                      <td className="tug">
+                        <span className="axis" />
+                        <span className={`bar ${s.net >= 0 ? "pos" : "neg"}`}
+                          style={s.net >= 0
+                            ? { left: "50%", width: `${w}%` }
+                            : { right: "50%", width: `${w}%` }} />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section className="panel season">
