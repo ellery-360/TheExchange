@@ -102,6 +102,42 @@ const FOOTBALL = [
   },
 ];
 
+const HOME = [
+  {
+    dest: "Coventry",
+    terminus: "Euston",
+    mins: "~15 min",
+    legs: [
+      "Walk 5 min to Holborn station",
+      "Central line westbound, 1 stop, to Tottenham Court Road",
+      "Northern line northbound, 3 stops, to Euston",
+    ],
+    note: "Avanti West Coast and West Midlands Trains both run it.",
+  },
+  {
+    dest: "Leamington Spa",
+    terminus: "Marylebone",
+    mins: "~20 min",
+    legs: [
+      "Walk 5 min to Holborn station",
+      "Central line westbound, 2 stops, to Oxford Circus",
+      "Bakerloo line northbound, 3 stops, to Marylebone",
+    ],
+    note: "Chiltern Railways. The slow scenic one, but no changes.",
+  },
+  {
+    dest: "Felixstowe",
+    terminus: "Liverpool Street",
+    mins: "~12 min",
+    legs: [
+      "Walk 5 min to Holborn station",
+      "Central line eastbound, 4 stops, straight to Liverpool Street",
+      "No change needed on the tube",
+    ],
+    note: "Greater Anglia to Ipswich, then the branch line to Felixstowe.",
+  },
+];
+
 export default function Crawl() {
   return (
     <div className="cr">
@@ -209,6 +245,42 @@ export default function Crawl() {
             </article>
           ))}
         </div>
+      </section>
+
+      {/* ------------------------------------------------------ home ---- */}
+      <section className="cr-panel">
+        <h2 className="cr-rubric">Getting Home from the Square Pig</h2>
+        <p className="cr-fblead">
+          Full time is around 7:30. Everything below starts with the same five
+          minute walk down Procter Street to <strong>Holborn</strong> station.
+        </p>
+        <div className="cr-home">
+          {HOME.map((h) => (
+            <article key={h.dest} className="cr-trip">
+              <div className="cr-triphead">
+                <h3>{h.dest}</h3>
+                <p className="cr-term">
+                  <a href={maps(h.terminus + " Station, London")} target="_blank" rel="noreferrer">
+                    {h.terminus}
+                  </a>
+                  <span className="cr-mins">{h.mins}</span>
+                </p>
+              </div>
+              <ol className="cr-legs">
+                {h.legs.map((l, i) => (
+                  <li key={i}>{l}</li>
+                ))}
+              </ol>
+              <p className="cr-note">{h.note}</p>
+            </article>
+          ))}
+        </div>
+        <p className="cr-rule">
+          <strong>Check your last train before the second half.</strong> Saturday
+          evening engineering works are a regular feature on all three of these
+          lines, and nobody wants to find out at 11pm. Thirty seconds on the
+          National Rail app at half time saves the night.
+        </p>
       </section>
 
       <footer className="cr-foot">
@@ -319,10 +391,14 @@ const CSS = `
   margin:0;line-height:.95;font-weight:400}
 .cr-sub{font-family:'Cinzel',serif;font-size:clamp(.58rem,1.8vw,.76rem);letter-spacing:.2em;
   text-transform:uppercase;color:var(--gold,#C9A227);margin:.8rem 0 1.3rem}
-.cr-btn{display:inline-block;font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.16em;
-  text-transform:uppercase;background:var(--gold,#C9A227);color:#12100C;
-  border:1px solid var(--gold,#C9A227);padding:.6rem 1.2rem;text-decoration:none}
-.cr-btn:hover{background:var(--vellum,#E7DCC4);border-color:var(--vellum,#E7DCC4)}
+
+/* .cr a is more specific than .cr-btn alone, so this has to out-weigh it
+   or the label renders gold on gold and disappears. */
+.cr a.cr-btn{display:inline-block;font-family:'Cinzel',serif;font-size:.68rem;
+  letter-spacing:.16em;text-transform:uppercase;background:#12100C;
+  color:var(--gold,#C9A227);border:1px solid var(--gold,#C9A227);
+  padding:.6rem 1.2rem;text-decoration:none}
+.cr a.cr-btn:hover{background:var(--gold,#C9A227);color:#12100C}
 
 .cr-panel{background:#1C1913;border:1px solid #332C1F;padding:1.4rem;margin-top:1.3rem}
 .cr-rubric{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;
@@ -377,6 +453,20 @@ const CSS = `
 .cr-bad{border-top:2px solid var(--rubric,#9E2B25)}
 .cr-walkfrom{font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.13em;text-transform:uppercase;
   color:var(--dim,#6E6553);margin:0 0 .6rem}
+
+/* getting home */
+.cr-home{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1px;
+  background:#332C1F;border:1px solid #332C1F}
+.cr-trip{background:#1C1913;padding:1.1rem;border-top:2px solid var(--lapis,#3A5A8C)}
+.cr-triphead h3{margin:0 0 .2rem;font-size:1.2rem;font-weight:600}
+.cr-term{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;
+  font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+  margin:0 0 .8rem;padding-bottom:.6rem;border-bottom:1px solid #241F17}
+.cr-mins{font-family:'Courier Prime',monospace;font-size:.72rem;color:var(--dim,#6E6553);
+  letter-spacing:0;text-transform:none;white-space:nowrap}
+.cr-legs{margin:0 0 .7rem;padding-left:1.1rem;font-size:.9rem}
+.cr-legs li{margin-bottom:.3rem}
+.cr-legs li::marker{color:var(--gold,#C9A227);font-family:'Courier Prime',monospace;font-size:.8rem}
 
 .cr-foot{text-align:center;margin-top:2.4rem;font-family:'Cinzel',serif;font-size:.62rem;
   letter-spacing:.2em;text-transform:uppercase;color:var(--dim,#6E6553)}
