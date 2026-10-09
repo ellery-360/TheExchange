@@ -157,10 +157,22 @@ export default function Crawl() {
       <section className="cr-panel cr-before">
         <h2 className="cr-rubric">Before the off</h2>
         <p>
-          Some of us are at the <strong>Wetherspoons in London Bridge</strong> for
-          breakfast first. Spoons normally stops serving breakfast at midday, so
-          be in by <strong>11:30</strong> if you want one. It is about ten minutes
-          on foot from there down to the first pub.
+          Some of us are starting at <strong>The Sun Wharf</strong>, the
+          Wetherspoons on Tooley Street, for breakfast.{" "}
+          <a href={maps("The Sun Wharf, 50 Tooley St, London SE1 2TF")}
+            target="_blank" rel="noreferrer" className="cr-inline">
+            50 Tooley St, SE1 2TF
+          </a>.
+        </p>
+        <p>
+          It opens at <strong>6:30am</strong> and Spoons normally stops serving
+          breakfast at midday, so anything before 11:30 is safe. Time still to be
+          agreed in the chat.
+        </p>
+        <p className="cr-note">
+          From there it is a six minute walk to the first pub. West along Tooley
+          Street, past Southwark Cathedral, and down onto Clink Street. About
+          500 metres.
         </p>
       </section>
 
@@ -171,8 +183,8 @@ export default function Crawl() {
         </div>
         <p className="cr-mapnote">
           Drawn to scale. About 1.8 miles of walking all in, none of it
-          difficult. Gold is the crawl. Dotted is the walk to the football
-          afterwards.
+          difficult. Gold is the crawl proper. The two dotted lines are the
+          optional bits at either end: breakfast beforehand, football after.
         </p>
       </section>
 
@@ -247,7 +259,6 @@ export default function Crawl() {
         </div>
       </section>
 
-      {/* ------------------------------------------------------ home ---- */}
       <section className="cr-panel">
         <h2 className="cr-rubric">Getting Home from the Square Pig</h2>
         <p className="cr-fblead">
@@ -306,13 +317,13 @@ function Map() {
   ];
 
   return (
-    <svg viewBox="0 0 1040 606" className="cr-map" role="img"
-      aria-label="Walking route from the Old Thameside Inn on the south bank, over London Bridge and west through the City to the Cittie of Yorke in Holborn">
+    <svg viewBox="0 0 1040 662" className="cr-map" role="img"
+      aria-label="Walking route from breakfast at The Sun Wharf on Tooley Street, up to the Old Thameside Inn, over London Bridge and west through the City to the Cittie of Yorke in Holborn, then on to the Square Pig for the football">
 
-      <rect width="1040" height="606" fill="#12100C" />
-      <rect x="14" y="14" width="1012" height="578" fill="none"
+      <rect width="1040" height="662" fill="#12100C" />
+      <rect x="14" y="14" width="1012" height="634" fill="none"
         stroke="#C9A227" strokeWidth="1.5" opacity="0.55" />
-      <rect x="21" y="21" width="998" height="564" fill="none"
+      <rect x="21" y="21" width="998" height="620" fill="none"
         stroke="#C9A227" strokeWidth="0.6" opacity="0.3" />
 
       {/* the river */}
@@ -326,7 +337,16 @@ function Map() {
         fill="none" stroke="#3A5A8C" strokeWidth="2" opacity="0.85" />
       <text x="300" y="430" className="cr-river">THE THAMES</text>
 
-      {/* on to the football, under everything else */}
+      {/* breakfast beforehand, dotted like the football */}
+      <path d="M932.1 603.7 L867.1 583.7 L829.7 539.5 L797.2 503"
+        fill="none" stroke="#6E6553" strokeWidth="2.5"
+        strokeDasharray="7 7" strokeLinecap="round" />
+      <circle cx="932.1" cy="603.7" r="7" fill="none" stroke="#6E6553" strokeWidth="2" />
+      <text x="918" y="626" textAnchor="end" className="cr-fbmark">
+        THE SUN WHARF · BREAKFAST
+      </text>
+
+      {/* on to the football */}
       <path d="M270.3 90.1 L162.9 78.1 L127.9 58"
         fill="none" stroke="#6E6553" strokeWidth="2.5"
         strokeDasharray="7 7" strokeLinecap="round" />
@@ -363,16 +383,16 @@ function Map() {
 
       {/* compass and scale */}
       <g opacity="0.75">
-        <circle cx="90" cy="566" r="2.5" fill="#C9A227" />
-        <path d="M90 566 L90 536 L85 546 L90 536 L95 546" fill="none"
+        <circle cx="90" cy="622" r="2.5" fill="#C9A227" />
+        <path d="M90 622 L90 592 L85 602 L90 592 L95 602" fill="none"
           stroke="#C9A227" strokeWidth="1.6" strokeLinejoin="round" />
-        <text x="90" y="528" textAnchor="middle" className="cr-compass">N</text>
+        <text x="90" y="584" textAnchor="middle" className="cr-compass">N</text>
       </g>
       <g opacity="0.65">
-        <line x1="170" y1="560" x2="350" y2="560" stroke="#E7DCC4" strokeWidth="1.6" />
-        <line x1="170" y1="555" x2="170" y2="565" stroke="#E7DCC4" strokeWidth="1.6" />
-        <line x1="350" y1="555" x2="350" y2="565" stroke="#E7DCC4" strokeWidth="1.6" />
-        <text x="260" y="550" textAnchor="middle" className="cr-compass">500 METRES</text>
+        <line x1="170" y1="616" x2="350" y2="616" stroke="#E7DCC4" strokeWidth="1.6" />
+        <line x1="170" y1="611" x2="170" y2="621" stroke="#E7DCC4" strokeWidth="1.6" />
+        <line x1="350" y1="611" x2="350" y2="621" stroke="#E7DCC4" strokeWidth="1.6" />
+        <text x="260" y="606" textAnchor="middle" className="cr-compass">500 METRES</text>
       </g>
     </svg>
   );
@@ -407,6 +427,7 @@ const CSS = `
 .cr-panel p:last-child{margin-bottom:0}
 .cr-before{border-left:3px solid var(--verdigris,#4E8C6A)}
 .cr-sam{border-left:3px solid var(--gold,#C9A227)}
+.cr-inline{font-family:'Courier Prime',monospace;font-size:.82rem}
 
 .cr-mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .cr-map{display:block;width:100%;min-width:660px;height:auto}
